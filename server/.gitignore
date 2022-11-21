@@ -26,7 +26,7 @@ pids
 *.pid.lock
 
 # PYTHON
-.env
+# .env Commented out because it's an example
 .venv
 env/
 venv/
