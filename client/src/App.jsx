@@ -1,32 +1,43 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
 
+const fetchToken = async (username, password) => {
+  const post = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  }
+  const response = await fetch('http://localhost:3000/login', post)
+  const { token } = await response.json()
+  return token
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleUsernameChange = e => setUsername(e.target.value)
+
+  const handlePasswordChange = e => setPassword(e.target.value)
+
+  const onSubmit = e => {
+    e.preventDefault()
+    const tokenPetition = fetchToken(username, password)
+    tokenPetition.then(token => console.log(`Received token: ${token}`))
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className='App'>
+      <form onSubmit={onSubmit}>
+        <input type='text' placeholder='username' value={username} onChange={handleUsernameChange} />
+        <input type='password' placeholder='password' value={password} onChange={handlePasswordChange} />
+        <button type='submit'>Submit</button>
+      </form>
     </div>
   )
 }
