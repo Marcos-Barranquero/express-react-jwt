@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import './App.css'
 
+const getCookiesAsDict = () => Object.fromEntries(
+  document.cookie.split(/; */).map(function (c) {
+    var index = c.indexOf('=') // Find the index of the first equal sign
+    var key = c.slice(0, index) // Everything upto the index is the key
+    var value = c.slice(index + 1) // Everything after the index is the value
+
+    // Return the key and value
+    return [decodeURIComponent(key), decodeURIComponent(value)]
+  })
+)
+
 const fetchToken = async (username, password) => {
   const post = {
     method: 'POST',
@@ -15,6 +26,25 @@ const fetchToken = async (username, password) => {
   const response = await fetch('http://localhost:3000/login', post)
   const { token } = await response.json()
   return token
+}
+
+const fetchAuth = async () => {
+  // Get token from cookies
+  // careful with this, can be multiple cookies
+  const cookiesDict = getCookiesAsDict()
+  const token = cookiesDict.token
+  console.log('Sending token:')
+  console.log(token)
+
+  const authRequest = fetch('http://localhost:3000/userAccess', {
+    method: 'POST',
+    headers: {
+      authorization: token,
+    },
+  })
+  const response = await authRequest
+  const { message } = await response.json()
+  return message
 }
 
 function App() {
@@ -37,6 +67,14 @@ function App() {
     })
   }
 
+  const onAuth = e => {
+    e.preventDefault()
+    const authRequest = fetchAuth()
+    authRequest.then(message => {
+      console.log(message)
+    })
+  }
+
   return (
     <div className='App'>
       <form onSubmit={onSubmit}>
@@ -44,6 +82,7 @@ function App() {
         <input type='password' placeholder='password' value={password} onChange={handlePasswordChange} />
         <button type='submit'>Submit</button>
       </form>
+      <button onClick={onAuth}>Fetch Auth</button>
     </div>
   )
 }

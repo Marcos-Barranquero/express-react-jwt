@@ -27,6 +27,20 @@ app.post('/login', (req, res) => {
   res.status(200).json({ token })
 })
 
+app.post('/userAccess', (req, res) => {
+  console.log('Petition received!')
+  console.log(req.body)
+  const token = req.headers['authorization'] // get token from explicit header
+
+  if (token === undefined) res.status(401).json({ message: 'No token provided' })
+
+  // verify token
+  jwt.verify(token, 'serverSecret', (err, decoded) => {
+    if (err) res.status(401).json({ message: 'Unauthorized' })
+    else res.status(200).json({ message: `${decoded} is authorized!` })
+  })
+})
+
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}!`)
 })
