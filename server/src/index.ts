@@ -1,6 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express()
 const PORT = 3000
@@ -16,12 +20,16 @@ app.get('/', (req, res) => {
 })
 
 // simple login route with jwt
-app.post('/login', (req, res) => {
-  const { username } = req.body
+app.post('/login', async (req, res) => {
+  const { password } = req.body
   // TODO: validate username and password
 
+  // hash the password
+  const salt = await bcrypt.genSalt(10)
+  const saltedPassword = await bcrypt.hash(password, salt)
+
   // create jwt token
-  const token = jwt.sign({ username }, 'serverSecret', { expiresIn: '1h' })
+  const token = jwt.sign({ saltedPassword }, process.env.SECRET, { expiresIn: '1h' })
 
   // send token to client
   res.status(200).json({ token })
