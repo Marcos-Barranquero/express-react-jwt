@@ -28,7 +28,13 @@ function App() {
   const onSubmit = e => {
     e.preventDefault()
     const tokenPetition = fetchToken(username, password)
-    tokenPetition.then(token => console.log(`Received token: ${token}`))
+    tokenPetition.then(token => {
+      const maxAge = 60 * 3 // token expires in 3 minutes
+      const path = '/' // cookie is valid for the entire site
+      const sameSite = 'strict' // cookie is only sent by the browser in first-party context
+      document.cookie = `token=${token}; max-age=${maxAge}; path=${path}; samesite=${sameSite}` // 1 hour
+      console.log(document.cookie)
+    })
   }
 
   return (

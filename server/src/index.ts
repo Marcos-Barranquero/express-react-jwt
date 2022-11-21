@@ -21,7 +21,7 @@ app.post('/login', (req, res) => {
   // TODO: validate username and password
 
   // create jwt token
-  const token = jwt.sign({ username }, 'serverSecret', { expiresIn: '10h' })
+  const token = jwt.sign({ username }, 'serverSecret', { expiresIn: '1h' })
 
   // send token to client
   res.status(200).json({ token })
